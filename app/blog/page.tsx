@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { supabase } from "@/lib/supabase"
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Blog – JSONShift | Data Format Guides & Tutorials",
@@ -7,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 }
 
-const POSTS = [
+const STATIC_POSTS = [
   {
     href: "/blog/json-vs-yaml",
     title: "JSON vs YAML: Which Format Should You Use?",
@@ -34,7 +37,23 @@ const POSTS = [
   },
 ]
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const { data: dynamicBlogs } = await supabase
+    .from('blogs')
+    .select('title, slug, meta_description, created_at')
+    .eq('site', 'jsonshift')
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+
+  const dynamicPosts = (dynamicBlogs || []).map(blog => ({
+    href: `/blog/${blog.slug}`,
+    title: blog.title,
+    excerpt: blog.meta_description,
+    date: new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+  }))
+
+  const allPosts = [...dynamicPosts, ...STATIC_POSTS]
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-3xl px-4 py-12">
@@ -42,7 +61,7 @@ export default function BlogPage() {
         <p className="mt-2 text-muted-foreground">Guides and tutorials for working with data formats</p>
 
         <div className="mt-8 flex flex-col gap-8">
-          {POSTS.map((post) => (
+          {allPosts.map((post) => (
             <Link
               key={post.href}
               href={post.href}
