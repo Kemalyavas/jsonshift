@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import { supabase } from "@/lib/supabase"
+import { BlogSearch } from "@/components/blog-search"
 
 export const revalidate = 60
 
@@ -60,19 +60,7 @@ export default async function BlogPage() {
         <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Blog</h1>
         <p className="mt-2 text-muted-foreground">Guides and tutorials for working with data formats</p>
 
-        <div className="mt-8 flex flex-col gap-8">
-          {allPosts.map((post) => (
-            <Link
-              key={post.href}
-              href={post.href}
-              className="group rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/20 hover:bg-muted/50"
-            >
-              <p className="text-xs text-muted-foreground">{post.date}</p>
-              <h2 className="mt-1 text-lg font-semibold text-foreground group-hover:underline">{post.title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{post.excerpt}</p>
-            </Link>
-          ))}
-        </div>
+        <BlogSearch posts={allPosts} />
       </main>
     </div>
   )
