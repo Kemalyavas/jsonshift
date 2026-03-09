@@ -192,28 +192,29 @@ function parseXML(input: string): Record<string, unknown> {
 
 // XML Generator
 function toXML(data: unknown, rootName = "root", indent = 0): string {
+  const safeName = sanitizeXMLName(rootName)
   const spaces = "  ".repeat(indent)
-  
+
   if (data === null || data === undefined) {
-    return `${spaces}<${rootName}/>`
+    return `${spaces}<${safeName}/>`
   }
-  
+
   if (typeof data !== "object") {
-    return `${spaces}<${rootName}>${escapeXML(String(data))}</${rootName}>`
+    return `${spaces}<${safeName}>${escapeXML(String(data))}</${safeName}>`
   }
-  
+
   if (Array.isArray(data)) {
-    return data.map(item => toXML(item, rootName, indent)).join("\n")
+    return data.map(item => toXML(item, safeName, indent)).join("\n")
   }
-  
+
   const obj = data as Record<string, unknown>
   const attributes: string[] = []
   const children: string[] = []
   let textContent = ""
-  
+
   for (const [key, value] of Object.entries(obj)) {
     if (key.startsWith("@")) {
-      attributes.push(`${key.slice(1)}="${escapeXML(String(value))}"`)
+      attributes.push(`${sanitizeXMLName(key.slice(1))}="${escapeXML(String(value))}"`)
     } else if (key === "#text") {
       textContent = String(value)
     } else {
@@ -222,16 +223,16 @@ function toXML(data: unknown, rootName = "root", indent = 0): string {
   }
   
   const attrStr = attributes.length > 0 ? " " + attributes.join(" ") : ""
-  
+
   if (children.length === 0 && !textContent) {
-    return `${spaces}<${rootName}${attrStr}/>`
+    return `${spaces}<${safeName}${attrStr}/>`
   }
-  
+
   if (children.length === 0) {
-    return `${spaces}<${rootName}${attrStr}>${escapeXML(textContent)}</${rootName}>`
+    return `${spaces}<${safeName}${attrStr}>${escapeXML(textContent)}</${safeName}>`
   }
-  
-  return `${spaces}<${rootName}${attrStr}>\n${children.join("\n")}\n${spaces}</${rootName}>`
+
+  return `${spaces}<${safeName}${attrStr}>\n${children.join("\n")}\n${spaces}</${safeName}>`
 }
 
 function escapeXML(str: string): string {
@@ -241,6 +242,11 @@ function escapeXML(str: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;")
+}
+
+function sanitizeXMLName(name: string): string {
+  const sanitized = name.replace(/[^a-zA-Z0-9_\-\.]/g, '_').replace(/^([^a-zA-Z_])/, '_$1')
+  return sanitized || '_'
 }
 
 // Main conversion function

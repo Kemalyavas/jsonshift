@@ -45,6 +45,7 @@ export function EditorPanel({
 }: EditorPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const dragCounterRef = useRef(0)
   const [isDragging, setIsDragging] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
 
@@ -60,19 +61,34 @@ export function EditorPanel({
     onChange?.("")
   }, [onChange])
 
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounterRef.current++
+    if (dragCounterRef.current === 1) {
+      setIsDragging(true)
+    }
+  }, [])
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
-    setIsDragging(true)
+    e.stopPropagation()
   }, [])
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
-    setIsDragging(false)
+    e.stopPropagation()
+    dragCounterRef.current--
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false)
+    }
   }, [])
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
+      e.stopPropagation()
+      dragCounterRef.current = 0
       setIsDragging(false)
 
       const file = e.dataTransfer.files[0]
@@ -177,6 +193,7 @@ export function EditorPanel({
           "relative flex-1",
           isDragging && "ring-2 ring-accent ring-inset"
         )}
+        onDragEnter={showDropZone ? handleDragEnter : undefined}
         onDragOver={showDropZone ? handleDragOver : undefined}
         onDragLeave={showDropZone ? handleDragLeave : undefined}
         onDrop={showDropZone ? handleDrop : undefined}
