@@ -94,6 +94,15 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border">
         <div className="container mx-auto max-w-7xl px-4 py-6">
+          <div className="mb-5 pb-5 border-b border-border">
+            <p className="text-xs font-semibold text-foreground mb-2">More Free Tools</p>
+            <div className="flex flex-wrap gap-x-5 gap-y-1">
+              <a href="https://imgpressr.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors">ImgPressr — Compress & convert images</a>
+              <a href="https://thepercentcalc.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors">PercentCalc — Percentage calculator</a>
+              <a href="https://caseformat.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors">CaseFormat — Text case converter</a>
+              <a href="https://faviconator.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Faviconator — Favicon generator</a>
+            </div>
+          </div>
           <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
             <p className="text-sm text-muted-foreground">
               Supports JSON, CSV, YAML, XML, and TOML formats
